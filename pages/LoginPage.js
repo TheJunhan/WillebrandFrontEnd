@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-11-12 19:48:38
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-02 21:37:13
+ * @LastEditTime: 2021-12-05 17:01:11
  */
 import Link from 'next/link'
 import Router from 'next/router'
@@ -43,14 +43,21 @@ class LoginPage extends Component
     }).then(res => res.text())
     .then(
         res => {
-            if(res!='-1') {
-              alert("Login successfully~")
-              localStorage.setItem('userId', res)
-              this.forceUpdate()
-              Router.push('/')
+            let user = JSON.parse(res)
+            if(user.userId == '-1') {
+              alert("Login failed, please check the email and the password!")
+            }
+            else if(user.role == 'BANNED') {
+              alert("Sorry, you are banned by the website manager!")
             }
             else {
-              alert("Login failed，please check the email and the password")
+              alert("Login successfully~")
+              localStorage.setItem('userId', user.userId)    
+              localStorage.setItem('userRole', user.role)
+              console.log(user)
+              console.log(user.role) 
+              this.forceUpdate()
+              Router.push('/')
             }
         })
   }

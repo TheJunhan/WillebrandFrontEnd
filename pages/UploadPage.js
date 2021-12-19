@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-11-14 16:31:18
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-03 14:24:43
+ * @LastEditTime: 2021-12-05 13:54:52
  */
 import React from "react";
 import {Button, Form, Input, Select, Modal} from 'antd';
@@ -228,8 +228,8 @@ export default class UploadPage extends React.Component {
                 <Form.Item label="Gender">
                     <Select id="gender" name="gender" style={{width:300}}
                     onChange={value=>this.handleSelectChange('gender', value)}>
-                        <Option value="Male">男</Option>
-                        <Option value="Female">女</Option>
+                        <Option value="Male">Male</Option>
+                        <Option value="Female">Female</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item label="Bleeding time">

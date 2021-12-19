@@ -21,7 +21,6 @@
  * Reference // both, Exon, Intron, None
  * Comments // both, Exon, Intron, None
  */
-import {Button} from 'antd'
 var columns = [
     {
       title: 'PatientID',
@@ -165,4 +164,17 @@ export function getColumn() {
 
 export function getWebSiteName() {
     return webSiteName;
+}
+
+var userManageColumn = [
+    {
+        title:'email',
+        dataIndex: 'email',
+        key: '1',
+        width: 300,
+    },
+]
+
+export function getUserColumn() {
+    return userManageColumn
 }

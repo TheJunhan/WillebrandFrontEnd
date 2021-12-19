@@ -2,20 +2,23 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-10-27 15:11:09
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-03 14:48:30
+ * @LastEditTime: 2021-12-18 23:24:47
  */
 import React from 'react'
 import { getWebSiteName } from '../../Services/ConstantService'
-import { UserOutlined, DownCircleOutlined } from '@ant-design/icons'
+import { UserOutlined, DownCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import 'antd/dist/antd.css'
-import { Avatar, Breadcrumb, Menu, Button, Dropdown} from 'antd'
+import { Avatar, Breadcrumb, Menu, Button, Dropdown, Upload, Input} from 'antd'
 import Router from 'next/router'
+import { getURL } from '../../Services/URLService'
+import axios from 'axios'
 
 class HeadBar extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            hasLogin: false
+            hasLogin: false,
+            isAdmin: false
         }
         if(typeof window == undefined) {
             console.log('现在还不能调用浏览器函数')
@@ -25,11 +28,18 @@ class HeadBar extends React.Component {
     componentDidMount() {
         console.log('调用了我')
         this.judgeLogin()
+        this.judgeRole()
     }
 
     judgeLogin = ()=>{
         if(localStorage.getItem("userId") != null && localStorage.getItem("userId") != -1) {
             this.setState({hasLogin: true}, ()=>{this.forceUpdate()})
+        }
+    }
+
+    judgeRole = () => {
+        if(localStorage.getItem("userRole") != null && localStorage.getItem("userRole") == 'ADMIN') {
+            this.setState({isAdmin: true})
         }
     }
 
@@ -46,6 +56,7 @@ class HeadBar extends React.Component {
             <div>
                 <p style={{position:'absolute', left:400, fontSize:30, color:'white'}}>{getWebSiteName()}</p>
                 {this.props.current == "Database" ? <this.uploadButton/> : null}
+                {this.props.current == "Database" && this.state.isAdmin ? <this.uploadFile/> : null}
                 <Breadcrumb style={{position:'absolute', right: 50, top:15}}>
                     <this.handleUser />
                 </Breadcrumb>
@@ -67,16 +78,33 @@ class HeadBar extends React.Component {
 
     userMenu = () => {
         if(this.state.hasLogin == true) {
-            return (
-                <Menu>
-                    <Menu.Item onClick = {()=>{Router.push('/UserCenter')}}>
-                        User Center
-                    </Menu.Item>
-                    <Menu.Item onClick={()=>{this.setState({hasLogin: false}, ()=>{localStorage.removeItem("userId")})}}>
-                        Exit
-                    </Menu.Item>
-                </Menu>
-            )
+            if(this.state.isAdmin == true) {
+                return (
+                    <Menu>
+                        <Menu.Item onClick = {()=>{Router.push('/UserCenter')}}>
+                            User Center
+                        </Menu.Item>
+                        <Menu.Item onClick = {() => {Router.push('/ManagerCenter')}}>
+                            Manager Center
+                        </Menu.Item>
+                        <Menu.Item onClick={()=>{this.onExit()}}>
+                            Exit
+                        </Menu.Item>
+                    </Menu>
+                )
+            }
+            else {
+                return (
+                    <Menu>
+                        <Menu.Item onClick = {()=>{Router.push('/UserCenter')}}>
+                            User Center
+                        </Menu.Item>
+                        <Menu.Item onClick={()=>{this.onExit()}}>
+                            Exit
+                        </Menu.Item>
+                    </Menu>
+                )
+            }
         }
         else {
             return (
@@ -89,15 +117,41 @@ class HeadBar extends React.Component {
         }
     }
 
+    onExit = () => {
+        this.setState({hasLogin: false}, ()=>{localStorage.removeItem("userId")})
+        this.setState({isAdmin: false}, ()=>{localStorage.removeItem("userRole")})
+        Router.push("/")
+    }
+
     uploadButton = () => {
         return (
             <Dropdown overlay={this.DropdownMenu} disabled={!this.state.hasLogin}
             trigger={['click']}>
               <div>
-                <Button style={{position:'absolute', right: 100, top:10}}>upload<DownCircleOutlined/></Button>
+                <Button style={{position:'absolute', right: 100, top:13}}>Upload<DownCircleOutlined/></Button>
               </div>
             </Dropdown>
         )
+    }
+
+    uploadFile = () => {
+        return <div>
+            <Upload customRequest={this.CustomUploadFileFunction}
+            showUploadList={false} style={{position:'absolute', right: 200, top:13}} 
+            accept='.csv, .xlsx, .xls'
+            >
+                <Button icon={<UploadOutlined />}>Upload File</Button>
+            </Upload>
+        </div>
+    }
+
+    CustomUploadFileFunction = (option) => {
+        let form = new FormData()
+        form.append('file', option.file)
+        form.append('id', localStorage.getItem("userId"))
+        axios.post(getURL() + '/uploadExcel', form).then(()=>{
+            this.props.updateDatabase()
+        })
     }
 
     DropdownMenu = (

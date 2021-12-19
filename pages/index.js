@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-10-27 14:40:39
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-03 11:39:09
+ * @LastEditTime: 2021-12-05 16:30:12
  */
 /**
  * 功能梳理：主页面（不用登录），登录、注册页面，上方刘海栏，用户是否登录的状态维护，
@@ -12,7 +12,6 @@
  */
 import Main from "./main"
 import 'antd/dist/antd.css'
-import UploadPage from "./UploadPage"
 export default function Home() {
   return (
     <div>

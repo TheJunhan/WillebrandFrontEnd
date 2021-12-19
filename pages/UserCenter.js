@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-12-03 14:42:27
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-03 17:12:55
+ * @LastEditTime: 2021-12-19 16:01:28
  */
 import React from "react"
 import { Table, Button, Layout } from 'antd'
@@ -52,7 +52,7 @@ class UserCenter extends React.Component {
             render: (text, recorder) => {
                 return (                
                 <Button type="primary" danger
-                    onClick={()=>{this.removeData(recorder.id); sendDelRequest(recorder.id);}}>
+                    onClick={()=>{this.removeData(recorder.id); this.sendDelRequest(recorder.id);}}>
                     delete
                 </Button>
                 )
