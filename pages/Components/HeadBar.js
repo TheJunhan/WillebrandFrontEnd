@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-10-27 15:11:09
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-18 23:24:47
+ * @LastEditTime: 2022-01-27 14:40:34
  */
 import React from 'react'
 import { getWebSiteName } from '../../Services/ConstantService'
@@ -55,7 +55,7 @@ class HeadBar extends React.Component {
         return (
             <div>
                 <p style={{position:'absolute', left:400, fontSize:30, color:'white'}}>{getWebSiteName()}</p>
-                {this.props.current == "Database" ? <this.uploadButton/> : null}
+                {this.props.current == "Database" ? <div><this.uploadButton/><this.downloadButton/></div> : null}
                 {this.props.current == "Database" && this.state.isAdmin ? <this.uploadFile/> : null}
                 <Breadcrumb style={{position:'absolute', right: 50, top:15}}>
                     <this.handleUser />
@@ -134,10 +134,18 @@ class HeadBar extends React.Component {
         )
     }
 
+    downloadButton = () => {
+        return (
+            <Button onClick={()=>{
+                this.props.download()
+            }} style={{position:'absolute', left: '20%', top: '3%'}}>DownLoad</Button>
+        )
+    }
+
     uploadFile = () => {
         return <div>
             <Upload customRequest={this.CustomUploadFileFunction}
-            showUploadList={false} style={{position:'absolute', right: 200, top:13}} 
+            showUploadList={false} style={{position:'absolute', left: '10%', top: '3%'}} 
             accept='.csv, .xlsx, .xls'
             >
                 <Button icon={<UploadOutlined />}>Upload File</Button>

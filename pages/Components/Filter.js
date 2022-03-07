@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-11-12 18:37:49
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-19 15:57:49
+ * @LastEditTime: 2022-02-02 10:32:06
  */
 import React from 'react'
 import { Collapse, Button, Form, Input, Select } from 'antd';
@@ -23,12 +23,15 @@ class Filter extends React.Component {
     handleSelectChange = (param, value) => {
         this.setState({[param]: value})
     }
+    handleInputChange = (e) => {
+        this.setState({[e.target.name]: e.target.value})
+    }
     getForms = () => {
         return (
             <Form style={{width:800, left:300}}>
                 <Form.Item>
-                    <Input id="fixId"  placeholder="patientID" style={{width:200}}/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;MutationLocation:&nbsp;
+                    <Input id="fixId"  placeholder="patientID" style={{width:200}} onChange={(e)=>this.handleInputChange(e)}/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Mutation Location:&nbsp;
                     <Select id="MutationLocation" name="MutationLocation" style={{width:200}}
                     onChange={(value)=>{this.handleSelectChange("MutationLocation", value)}}
                     >
@@ -40,7 +43,7 @@ class Filter extends React.Component {
                 </Form.Item>
                 <Form.Item>
                     {/* 下拉框 */}
-                    &nbsp;illType:&nbsp;
+                    &nbsp;VWD type:&nbsp;
                     <Select id="illType" name="illType" style={{width:200}}
                     onChange={(value)=>{this.handleSelectChange("illType", value)}}
                     >
@@ -75,12 +78,12 @@ class Filter extends React.Component {
                         <Option value="Not known">Not known</Option>
                     </Select>
                     &nbsp;&nbsp;&nbsp;
-                    <Input id="Region" placeholder="Region" style={{width:200}}/>
+                    <Input id="Region" placeholder="Exon No." style={{width:200}} onChange={(e)=>this.handleInputChange(e)}/>
                 </Form.Item>
                 <Form.Item>
-                    <Input id="Nucleotide" placeholder="Nucleotide" style={{width:200}}/>
+                    <Input id="Nucleotide" placeholder="Nucleotide change" style={{width:200}} onChange={(e)=>this.handleInputChange(e)}/>
                     &nbsp;&nbsp;&nbsp;
-                    <Input id="aminoAcid" placeholder="aminoAcid" style={{width:200}}/>
+                    <Input id="aminoAcid" placeholder="Protein primary structure changes" style={{width:200}} onChange={(e)=>this.handleInputChange(e)}/>
                 </Form.Item>
             </Form>
         )
@@ -90,7 +93,7 @@ class Filter extends React.Component {
             <Collapse collapsible="header">
                 <Panel header="click here to search" key="1">
                     <this.getForms />
-                    <Button type="primary" onClick={()=>{this.handleSearch()}}>点击查询</Button>
+                    <Button type="primary" onClick={()=>{this.handleSearch()}}>search</Button>
                 </Panel>
           </Collapse>
         )

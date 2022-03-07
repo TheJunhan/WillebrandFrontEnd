@@ -2,12 +2,13 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-11-14 16:31:18
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-05 13:54:52
+ * @LastEditTime: 2022-02-02 10:17:26
  */
 import React from "react";
 import {Button, Form, Input, Select, Modal} from 'antd';
+import 'antd/dist/antd.css'
 import {getURL} from '../Services/URLService'
-import { Router } from "next/router";
+import Router from 'next/router';
 const Url = getURL()
 const {Option} = Select
 const layout=
@@ -48,8 +49,11 @@ export default class UploadPage extends React.Component {
             BS:"",
             Reference:"",
             Comments:"",
+            isWT: false,
+            // placeHolder
+            ncPlaceHolder:'',
+            ppscPlaceHolder:'',
         }
-        this.setState({MutationLocation: props.MutationLocation})
     }
     
     render() {
@@ -74,26 +78,33 @@ export default class UploadPage extends React.Component {
                             {this.state.fixedId?"Adding for"+this.state.fixedId+"，click to Cancel":"Add for existed"}
                         </Button>
                     </Form.Item>
-                    {localStorage.getItem("MutationLocation") != 'WT(Wild type)' ? <this.specialCondition/> : null}
+                    {!this.state.isWT ? <this.specialCondition/> : null}
                     <this.basicCondition/>
                     <Form.Item>
                         <Button type='primary' style={{position:"absolute", left:200}}
                         onClick={()=>{this.upload()}}>
                         Upload</Button>
                         <Button style={{position:"absolute", left:400}}
-                        onClick={()=>{Router.push("/DatabasePage")}}>Cancel</Button>
+                        onClick={()=>{ Router.push("/DatabasePage") }}>Cancel</Button>
                     </Form.Item>
                 </Form>
             </div>
         )
     }
+    componentDidMount() {
+        this.setState({MutationLocation: localStorage.getItem("MutationLocation")})
+        if(localStorage.getItem("MutationLocation") == 'WT(Wild type)')
+            this.setState({isWT: true})
+    }
+
     modalModule = () => {
         return (
             <div>
                 <Modal title="PatientID" visible={this.state.showModal} 
                 onOk={()=>{this.getDup(); this.setState({showModal: !this.state.showModal})}} 
                 onCancel={()=>{this.setState({showModal: !this.state.showModal}); this.setState({fixedId: null})}}>
-                    <Input id="fixedId" name="fixedId" placeholder="Please input the patientID" type="number" onChange={(e)=>{this.setState({fixedId: e.target.value})}} />
+                    <Input id="fixedId" name="fixedId" placeholder="Please input the patientID" type="number" 
+                    onChange={(e)=>{this.setState({fixedId: e.target.value})}} value={this.state.fixedId}/>
                 </Modal>
             </div>
         )
@@ -102,7 +113,40 @@ export default class UploadPage extends React.Component {
         this.setState({[e.target.name]: e.target.value})
     }
     handleSelectChange = (param, value) => {
-        this.setState({[param]: value}, ()=>{console.log(this.state.Genotype)})
+        this.setState({[param]: value}, ()=>{
+            if(this.state.MutationLocation != 'WT(Wild type)' ) {
+                if(this.state.MutationLocation == 'Exonic mutation') {
+                    if(this.state.MutationType == 'Missense') {
+                        this.setState({ncPlaceHolder: '6860G>A, 1450_1451delinsAG（UNDERLINE）',
+                            ppscPlaceHolder: 'Arg2287Gln, His484Ser'})
+
+                    }
+                    else if(this.state.MutationType == 'Insertion, Duplication and Deletion') {
+                        this.setState({ncPlaceHolder: '901_902 ins CTA, 1268_1270 del TCT,  6487_6531 dup, Exon 6 del, Exon 6 dup   ',
+                            ppscPlaceHolder: 'Glu300_Arg302 ins SerAsn, Phe423 del, Cys2163_Ile2177 dup,'})
+                    }
+                    else if(this.state.MutationType == 'Frameshift mutations') {
+                        this.setState({ncPlaceHolder: '4414 delG, 4850_4859 delTTGGGGAGGG, 6949 dupG, 6379 del14, ',
+                            ppscPlaceHolder: 'Asp1472 fs, Lys1617 fs, Asp2317 fs, Val2133Pro fs*12'})
+                    }
+                    else if(this.state.MutationType == 'Nonsense') {
+                        this.setState({ncPlaceHolder: '7969C>T',
+                            ppscPlaceHolder: 'Gln2657*'})
+                    }
+                    else {
+                        this.setState({ncPlaceHolder: '', ppscPlaceHolder: ''})
+                    }
+                }
+                else {
+                    if(this.state.MutationType == 'Missense') {
+                        this.setState({ncPlaceHolder: '-2522C>T, 533-2A>G, 3539-2 delA, 7729-5G>A(DASH), 8190_8253+1 dup64, 5312-104_5455+642 del'})
+                    }
+                    else {
+                        this.setState({ncPlaceHolder: ''})
+                    }
+                }
+            }
+        })
     }
     /**
      * 特殊条件
@@ -129,10 +173,10 @@ export default class UploadPage extends React.Component {
                 <Select style={{width:300}} name="MutationType"
                 onChange={(value)=>{this.handleSelectChange('MutationType', value);}}
                 >
-                    <Option value="Deletion">Deletion</Option>
-                    <Option value="Duplication">Duplication</Option>
-                    <Option value="Insertion">Insertion</Option>
-                    <Option value="Deletion and Insertion">Deletion and Insertion</Option>
+                    <Option value = "Missense">Missense</Option>
+                    <Option value="Insertion, Duplication and Deletion">Insertion, Duplication and Deletion</Option>
+                    <Option value = "Frameshift mutations">Frameshift mutations</Option>
+                    <Option value = "Nonsense">Nonsense</Option>
                 </Select>
             </Form.Item>
 
@@ -150,18 +194,17 @@ export default class UploadPage extends React.Component {
             </Form.Item>
             
             <Form.Item label="Exon No." name="Region" rules={[{required:true, message:"格式不正确，请参考提示"}]}>
-                <Input placeholder='(23,24]'
-                name="Region" onChange={e=>this.handleInputChange(e)} />
+                <Input name="Region" onChange={e=>this.handleInputChange(e)} value={this.state.Region} />
             </Form.Item>
 
-            <Form.Item label="Nucleotide change" name="Nucleotide substitution" rules={[{required:true, message:"格式不正确，请参考提示"}]}>
-                <Input placeholder={this.state.forthPlaceHold} 
+            <Form.Item label="Nucleotide change" name="Nucleotide substitution">
+                <Input placeholder={this.state.ncPlaceHolder} value={this.state.Nucleotide}
                 name="Nucleotide" onChange={e=>this.handleInputChange(e)} />
             </Form.Item>
 
             <Form.Item label="Protein primary structure changes" name="Amino acid change">
-                <Input placeholder={this.state.fifthPlaceHold}
-                name = "aminoAcid"
+                <Input placeholder={this.state.ppscPlaceHolder}
+                name = "aminoAcid" value={this.state.aminoAcid}
                 onChange={e=>this.handleInputChange(e)}
                 />
             </Form.Item>
@@ -176,38 +219,37 @@ export default class UploadPage extends React.Component {
             <div>
                 <Form.Item label="activated partial thromboplastin time">
                     <Input id = 'Aptt' name = 'Aptt' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.aptt}
                      />
                 </Form.Item>
                 <Form.Item label="VWF antigen level">
                     <Input id = 'VWFAg' name = 'VWFAg' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
-                        style={{width:300}}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.VWFAg}
                     />
                 </Form.Item>
                 <Form.Item label="VWF activity level">
                     <Input id = 'VWFAct' name = 'VWFAct' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.VWFAct}
                     />
                 </Form.Item>
                 <Form.Item label="ristocetin-induced platelet agglutination">
                     <Input id = 'RIPA' name = 'RIPA' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.RIPA}
                     />
                 </Form.Item>
                 <Form.Item label="The activity level of FVIII">
                     <Input id = 'FVIII' name = 'FVIII' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.FVIII}
                     />
                 </Form.Item>
                 <Form.Item label="VWF collagen binding capacity">
                     <Input id = 'VWFCB' name = 'VWFCB' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.VWFCB}
                     />
                 </Form.Item>
                 <Form.Item label="VWF propeptide level">
                     <Input id = 'VWFPP' name = 'VWFPP' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.VWFPP}
                     />
                 </Form.Item>
                 <Form.Item label="Blood type">
@@ -222,7 +264,7 @@ export default class UploadPage extends React.Component {
                 </Form.Item>
                 <Form.Item label="Age">
                     <Input id = 'age' name = 'age' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.age}
                     />
                 </Form.Item>
                 <Form.Item label="Gender">
@@ -234,17 +276,17 @@ export default class UploadPage extends React.Component {
                 </Form.Item>
                 <Form.Item label="Bleeding time">
                     <Input id = 'BS' name = 'BS' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.BS}
                     />
                 </Form.Item>
                 <Form.Item label="References">
                     <Input id = 'Reference' name = 'Reference' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.reference}
                     />
                 </Form.Item>
                 <Form.Item label="Comments">
                     <Input id = 'Comments' name = 'Comments' style={{width:300}}
-                        onChange={e=>this.handleInputChange(e)}
+                        onChange={e=>this.handleInputChange(e)} value={this.state.comments}
                     />
                 </Form.Item>
             </div>
@@ -288,6 +330,7 @@ export default class UploadPage extends React.Component {
         }).then((response)=>{return response.text()}).then((response) => {
             if(response == 'success') {
                 alert('Upload successfully~')
+                Router.push('/DatabasePage')
             }
             else {
                 alert('Fail to upload, please check and try again')
@@ -320,26 +363,8 @@ export default class UploadPage extends React.Component {
                     BS:tmp.BS,
                     Reference:tmp.reference,
                     Comments:tmp.comments
-                }, ()=>{this.refresh()})
+                })
             }
         })
-    }
-    /**
-     * 更新生理状况
-     */
-    refresh = () => {
-        document.getElementById("Aptt").value = this.state.Aptt;
-        document.getElementById("VWFAg").value = this.state.VWFAg;
-        document.getElementById("VWFAct").value = this.state.VWFAct;
-        document.getElementById("RIPA").value = this.state.RIPA;
-        document.getElementById("FVIII").value = this.state.FVIII;
-        document.getElementById("VWFCB").value = this.state.VWFCB;
-        document.getElementById("VWFPP").value = this.state.VWFPP;
-        document.getElementById("BloodType").value = this.state.BloodType;
-        document.getElementById("age").value = this.state.age;
-        document.getElementById("gender").value = this.state.gender;
-        document.getElementById("BS").value = this.state.BS;
-        document.getElementById("Reference").value = this.state.Reference;
-        document.getElementById("Comments").value = this.state.Comments;
     }
 }
