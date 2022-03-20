@@ -2,7 +2,7 @@
  * @Copyrights: 2021 @TheJunhan
  * @Date: 2021-11-12 19:27:01
  * @LastEditor: TheJunhan
- * @LastEditTime: 2021-12-03 16:57:14
+ * @LastEditTime: 2022-03-08 14:21:56
  */
 import React from 'react'
 import { getColumn } from '../../Services/ConstantService'
@@ -13,7 +13,7 @@ export default class Database extends React.Component {
         return (
             <div>
                 <Table dataSource={this.props.data} columns={getColumn()}
-                 pagination={{ pageSize: 50 }} scroll={{ y: 1000 }}/>
+                 pagination={{ pageSize: 50 }} scroll={{ x: 1000, y: 5000 }} />
             </div>
         )
     }

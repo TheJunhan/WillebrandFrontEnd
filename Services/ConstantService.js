@@ -23,7 +23,7 @@
  */
 var columns = [
     {
-      title: 'PatientID',
+      title: 'PatientId',
       dataIndex: 'fixedId',
       key: '1',
       width: 100,
@@ -41,7 +41,7 @@ var columns = [
       width: 100,
     },
     {
-      title: 'Mutation Type',
+      title: 'Mutation type',
       dataIndex: 'mutationType',
       key: '3',
       width: 100,
@@ -148,16 +148,16 @@ var columns = [
         title: 'References',
         dataIndex: 'reference',
         key: '19',
-        width: 150,
+        width: 400,
     },
     {
         title: 'Comments',
         dataIndex: 'comments',
         key: '20',
-        width: 150,
+        width: 400,
     },
   ];
-var webSiteName = "von Willebrand factor Variant Database"
+var webSiteName = "Von Willebrand factor Variant Database"
 export function getColumn() {
     return columns;
 }

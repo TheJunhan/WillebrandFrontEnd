@@ -8,7 +8,7 @@ import React from 'react'
 import { getWebSiteName } from '../../Services/ConstantService'
 import { UserOutlined, DownCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import 'antd/dist/antd.css'
-import { Avatar, Breadcrumb, Menu, Button, Dropdown, Upload, Input} from 'antd'
+import { Avatar, Breadcrumb, Menu, Button, Dropdown, Upload} from 'antd'
 import Router from 'next/router'
 import { getURL } from '../../Services/URLService'
 import axios from 'axios'
@@ -20,7 +20,7 @@ class HeadBar extends React.Component {
             hasLogin: false,
             isAdmin: false
         }
-        if(typeof window == undefined) {
+        if(typeof window === undefined) {
             console.log('现在还不能调用浏览器函数')
         }
     }
@@ -57,6 +57,7 @@ class HeadBar extends React.Component {
                 <p style={{position:'absolute', left:400, fontSize:30, color:'white'}}>{getWebSiteName()}</p>
                 {this.props.current == "Database" ? <div><this.uploadButton/><this.downloadButton/></div> : null}
                 {this.props.current == "Database" && this.state.isAdmin ? <this.uploadFile/> : null}
+                {this.props.current === 'help' && <Button onClick={()=>{Router.push('/')}}>Main Page</Button>}
                 <Breadcrumb style={{position:'absolute', right: 50, top:15}}>
                     <this.handleUser />
                 </Breadcrumb>
@@ -138,7 +139,7 @@ class HeadBar extends React.Component {
         return (
             <Button onClick={()=>{
                 this.props.download()
-            }} style={{position:'absolute', left: '20%', top: '3%'}}>DownLoad</Button>
+            }} style={{position:'absolute', left: '15%', top: '2%'}}>DownLoad</Button>
         )
     }
 
